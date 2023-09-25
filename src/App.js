@@ -5,6 +5,8 @@ import AdminHome from './components/AdminHome';
 import ShowSchedule from './components/ShowSchedule';
 
 function App() {
+
+  
   return (
     <div className="App">
       <h2>Registration Service</h2>
