@@ -12,11 +12,10 @@ import TextField from '@mui/material/TextField';
 function AddStudent(props) { 
 
   const [open, setOpen] = useState(false);
-//   const [course_id, setCourse_id] = useState(0)
-  const [studentEmail, setStudent_email] = useState(0);
   const [name, setStudent_name] = useState(0);
+  const [email, setStudent_email] = useState(0);
+  const [code, setStudent_code] = useState(0);
   const [status, setStudent_status] = useState(0);
- 
   
   const handleClickOpen = () => {
     setOpen(true);
@@ -28,17 +27,22 @@ function AddStudent(props) {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (name === 'studentEmail') {
-      setStudent_email(value);
-    } else if (name === 'name') {
+    if (name === 'name') {
       setStudent_name(value);
-    } else if (name === 'status') {
+    }
+    else if (name === 'email') {
+      setStudent_email(value);
+    }
+    else if (name === 'code') {
+      setStudent_code(value);
+    }
+    else if (name === 'status') {
       setStudent_status(value);
     }
   }
 
   const handleAdd = () => {
-      props.addStudent(studentEmail, name, status);
+      props.addStudent(name, email, code, status);
       handleClose();
   }
 
@@ -50,13 +54,16 @@ function AddStudent(props) {
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Add Student</DialogTitle>
             <DialogContent  style={{paddingTop: 15}} >
-              <TextField id="email" autoFocus fullWidth label="Student Email" name="studentEmail" onChange={handleChange}/>
+              <TextField id="name" autoFocus fullWidth label="Student Name" name="name" onChange={handleChange}/>
               <br></br>
               <br></br>
-              <TextField id="name" autoFocus fullWidth label="Student Name" name="name" onChange={handleChange}/> 
+              <TextField id="email" fullWidth label="Student Email" name="email" onChange={handleChange}/> 
               <br></br>
               <br></br>
-              <TextField id="status" autoFocus fullWidth label="Student Status" name="status" onChange={handleChange}/> 
+              <TextField id="code" fullWidth label="Student Status Code" name="code" onChange={handleChange}/>
+              <br></br>
+              <br></br>
+              <TextField id="status" fullWidth label="Student Status" name="status" onChange={handleChange}/> 
             </DialogContent>
             <DialogActions>
               <Button color="secondary" onClick={handleClose}>Cancel</Button>

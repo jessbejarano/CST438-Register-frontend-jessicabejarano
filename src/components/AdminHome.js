@@ -31,78 +31,100 @@ const AdminHome = ()  => {
   /*
   *  add student
   */ 
-    const addStudent = (email, name, status) => {
+    const addStudent = (name, email, code, status) => {
       setMessage('');
       console.log("start addStudent"); 
 
-      const requestBody = {
-        email: email,
-        name: name,
-        status: status
-      };
+      if(!isValidEmail(email)){
+        alert("Invalid email format. Please enter a valid email address.");
+    } else {
+        const requestBody = {
+            name: name, // Match the field name with what the server expects
+            email: email, // Match the field name with what the server expects
+            statusCode: code,
+            status: status
+          };
+    
+          fetch(`${SERVER_URL}/students/add`,
+          { 
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+              },
+              body: JSON.stringify(requestBody),
+          })
+          .then(res => {
+              if (res.ok) {
+              console.log("addStudent ok");
+    
+              setMessage("Student added.");
+              fetchStudents();
+              } else {
+              console.log('error addStudent ' + res.status);
+              setMessage("Error. "+res.status);
+              }})
+          .catch(err => {
+              console.error("exception addStudent "+ err);
+              setMessage("Exception. "+err);
+          })
+    }
+  }
 
-      fetch(`${SERVER_URL}/students/add`,
-      { 
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json', // Set the content type to JSON
-          },
-          body: JSON.stringify(requestBody),
-      })
-      .then(res => {
-          if (res.ok) {
-          console.log("addStudent ok");
-
-          setMessage("Student added.");
-          fetchStudents();
-          } else {
-          console.log('error addStudent ' + res.status);
-          setMessage("Error. "+res.status);
-          }})
-      .catch(err => {
-          console.error("exception addStudent "+ err);
-          setMessage("Exception. "+err);
-      })
+  function isValidEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailPattern.test(email);
   }
 
  /*
   *  update student
   */ 
-  const updateStudent = (email, code, status) => {
+  const updateStudent = (id, name, email, code, status) => {
     setMessage('');
-
-    fetch(`${SERVER_URL}/students/update?email=${email}&statusCode=${code}&statusMsg=${status}`, {
-        method: 'PUT',
-    })
-        .then((response) => {
-            if (response.ok) {
-                console.log("Student updated successfully");
-                setMessage("Student updated successfully.");
-                fetchStudents();
-            } else {
-                console.log("Status update error");
-                setMessage("Error updating status: " + response.statusText);
-            }
+    if(!isValidEmail(email)){
+        alert("Invalid email format. Please enter a valid email address.");
+    } else {
+        const requestBody = {
+            name: name, // Match the field name with what the server expects
+            email: email, // Match the field name with what the server expects
+            statusCode: code,
+            status: status
+          };
+    
+        fetch(`${SERVER_URL}/students/update/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+              },
+              body: JSON.stringify(requestBody),
         })
-        .catch((error) => {
-            console.error("Exception updating status:", error);
-            setMessage("Exception updating status: " + error);
-        });
+            .then((response) => {
+                if (response.ok) {
+                    console.log("Student updated successfully");
+                    setMessage("Student updated successfully.");
+                    fetchStudents();
+                } else {
+                    console.log("Student update error");
+                    setMessage("Error updating student" + response.statusText);
+                }
+            })
+            .catch((error) => {
+                console.error("Exception updating student", error);
+                setMessage("Exception updating student" + error);
+            });
+    }
   }
 
 
   /* 
    *   delete Student
    */ 
-
-  const deleteStudent = (event) => {
+  const deleteStudent = (studentid) => {
     setMessage('');
-    const row_id = event.target.parentNode.parentNode.rowIndex - 1;
-    console.log("drop student "+row_id);
-    const studentEmail = students[row_id].email;
+    // const row_id = event.target.parentNode.parentNode.rowIndex;
+    console.log("drop student "+studentid);
     
     if (window.confirm('Are you sure you want to delete the student?')) {
-        fetch(`${SERVER_URL}/students/delete/${studentEmail}`,
+        fetch(`${SERVER_URL}/students/delete/${studentid}`,
         {
             method: 'DELETE',
         }
@@ -114,7 +136,7 @@ const AdminHome = ()  => {
             fetchStudents();
         } else {
             console.log("drop error");
-            setMessage("Error deleteStudent. "+res.status);
+            setMessage("Error deleteStudent, student has enrollments. Status: "+res.status);
         }
         })
     .catch( (err) => {
@@ -153,7 +175,7 @@ const AdminHome = ()  => {
                           <td>{row.statusCode}</td>
                           <td>{row.status}</td>
                           <td>      <EditStudent updateStudent={updateStudent} /></td>
-                          <td><button type="button" margin="auto" onClick={deleteStudent}>Delete</button></td>
+                          <td><button type="button" margin="auto" onClick={() => deleteStudent(row.student_id)}>Delete</button></td>
                           </tr>
                       ))}
                   </tbody>
