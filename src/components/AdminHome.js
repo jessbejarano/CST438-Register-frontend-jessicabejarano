@@ -174,13 +174,13 @@ const AdminHome = ()  => {
                           <td>{row.email}</td>
                           <td>{row.statusCode}</td>
                           <td>{row.status}</td>
-                          <td>      <EditStudent updateStudent={updateStudent} /></td>
-                          <td><button type="button" margin="auto" onClick={() => deleteStudent(row.student_id)}>Delete</button></td>
+                          <td>      <EditStudent id="updateStudentButton" updateStudent={updateStudent} /></td>
+                          <td><button type="button" id="deleteButton" margin="auto" onClick={() => deleteStudent(row.student_id)}>Delete</button></td>
                           </tr>
                       ))}
                   </tbody>
               </table>
-              <AddStudent addStudent={addStudent} />
+              <AddStudent id="addStudentButton" addStudent={addStudent} />
         
           </div>
       );
