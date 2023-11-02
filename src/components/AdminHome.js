@@ -3,21 +3,25 @@ import AddStudent from './AddStudent';
 import EditStudent from './EditStudent';
 import {SERVER_URL, SEMESTERS} from '../constants';
 
-const AdminHome = ()  => {
+const AdminHome = (isAuthenticated)  => {
 
   const [students, setStudents] = useState([]);  // list of students
   const [message, setMessage] = useState(' ');  // status message
 
     useEffect(() => {
         // called once after intial render
+        const jwtToken = sessionStorage.getItem("jwt");
+        if (jwtToken) {
+            isAuthenticated(true);
+        }
         fetchStudents();
         }, [] )
 
 
     // Fetching All Students
     const fetchStudents = () => {
-		//TODO complete this method to fetch students and display list of students
       console.log("fetchStudents");
+
       fetch(`${SERVER_URL}/students`)
       .then((response) => { return response.json(); } )
         .then((data) => { setStudents(data); })
@@ -44,12 +48,14 @@ const AdminHome = ()  => {
             statusCode: code,
             status: status
           };
-    
+          const token = sessionStorage.getItem('jwt');
+
           fetch(`${SERVER_URL}/students/add`,
           { 
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json', // Set the content type to JSON
+                'Authorization' : `${token}`,
               },
               body: JSON.stringify(requestBody),
           })
@@ -89,11 +95,13 @@ const AdminHome = ()  => {
             statusCode: code,
             status: status
           };
+        const token = sessionStorage.getItem('jwt');
     
         fetch(`${SERVER_URL}/students/update/${id}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json', // Set the content type to JSON
+                'Content-Type': 'application/json',
+                'Authorization' : `${token}`
               },
               body: JSON.stringify(requestBody),
         })
@@ -124,6 +132,8 @@ const AdminHome = ()  => {
     console.log("drop student "+studentid);
     
     if (window.confirm('Are you sure you want to delete the student?')) {
+        const token = sessionStorage.getItem('jwt');
+    
         fetch(`${SERVER_URL}/students/delete/${studentid}`,
         {
             method: 'DELETE',
@@ -156,7 +166,7 @@ const AdminHome = ()  => {
           </div>
           );
     } else { 
-      return(
+      return( isAuthenticated? (
           <div margin="auto" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} >
               <h3>Student List</h3>
               <h4>{message}</h4>
@@ -183,6 +193,7 @@ const AdminHome = ()  => {
               <AddStudent id="addStudentButton" addStudent={addStudent} />
         
           </div>
+      ) : null
       );
   }
 }

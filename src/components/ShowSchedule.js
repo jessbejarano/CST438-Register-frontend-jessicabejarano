@@ -35,9 +35,18 @@ const ShowSchedule = () => {
    *  GET enrolled courses for given term
    */ 
     const fetchCourses = (termId) => {
-        const {year, semester} = SEMESTERS[termId];
         console.log("fetchCourses "+year+" "+semester);
-        fetch(`${SERVER_URL}/schedule?year=${year}&semester=${semester}`)
+        
+        const {year, semester} = SEMESTERS[termId];
+
+        const token = sessionStorage.getItem('jwt');
+
+        fetch(`${SERVER_URL}/schedule?year=${year}&semester=${semester}`, {
+        headers: {
+        'Authorization' : `${token}`
+        }
+        })
+        
         .then((response) => { return response.json(); } )
         .then((data) => { setCourses(data); })
         .catch((err) =>  { 
@@ -52,9 +61,15 @@ const ShowSchedule = () => {
     const  addCourse = (course_id) => {
         setMessage('');
         console.log("start addCourse"); 
+        const token = sessionStorage.getItem('jwt');
+
         fetch(`${SERVER_URL}/schedule/course/${course_id}`,
         { 
             method: 'POST', 
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization' : `${token}`,
+              }
         })
         .then(res => {
             if (res.ok) {
@@ -81,9 +96,14 @@ const ShowSchedule = () => {
         const enrollment_id = courses[row_id].id;
         
         if (window.confirm('Are you sure you want to drop the course?')) {
+            const token = sessionStorage.getItem('jwt');
             fetch(`${SERVER_URL}/schedule/${enrollment_id}`,
             {
                 method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization' : `${token}`,
+                  }
             }
             )
         .then(res => {
